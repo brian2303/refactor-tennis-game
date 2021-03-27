@@ -69,19 +69,14 @@ public class TennisGame1 implements TennisGame {
         switch(scoreByPlayer)
         {
             case 0:
-                score+="Love";
-                break;
+                return score+="Love";
             case 1:
-                score+="Fifteen";
-                break;
+                return score+="Fifteen";
             case 2:
-                score+="Thirty";
-                break;
-            case 3:
-                score+="Forty";
-                break;
+                return score+="Thirty";
+            default:
+                return score+="Forty";
         }
-        return score;
     }
 
     public Boolean isResultEqual(){
