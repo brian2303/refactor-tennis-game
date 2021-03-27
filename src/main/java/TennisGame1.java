@@ -1,76 +1,110 @@
 
 public class TennisGame1 implements TennisGame {
     
-    private int m_score1 = 0;
-    private int m_score2 = 0;
-    private String player1Name;
-    private String player2Name;
+    private int scorePlayer1 = 0;
+    private int scorePlayer2 = 0;
+    private String player1;
+    private String player2;
 
-    public TennisGame1(String player1Name, String player2Name) {
-        this.player1Name = player1Name;
-        this.player2Name = player2Name;
-    }
-
-    public void wonPoint(String playerName) {
-        if (playerName == "player1")
-            m_score1 += 1;
-        else
-            m_score2 += 1;
+    public TennisGame1(String player1, String player2) {
+        this.player1 = player1;
+        this.player2 = player2;
     }
 
     public String getScore() {
         String score = "";
-        int tempScore=0;
-        if (m_score1==m_score2)
-        {
-            switch (m_score1)
-            {
-                case 0:
-                        score = "Love-All";
-                    break;
-                case 1:
-                        score = "Fifteen-All";
-                    break;
-                case 2:
-                        score = "Thirty-All";
-                    break;
-                default:
-                        score = "Deuce";
-                    break;
-                
-            }
-        }
-        else if (m_score1>=4 || m_score2>=4)
-        {
-            int minusResult = m_score1-m_score2;
-            if (minusResult==1) score ="Advantage player1";
-            else if (minusResult ==-1) score ="Advantage player2";
-            else if (minusResult>=2) score = "Win for player1";
-            else score ="Win for player2";
-        }
+        if (isResultEqual()) score = getScoreWhenTie(scorePlayer1);
+        else if (isResultGreaterThanFour()) score = getScoreWhenIsAdvantageOrWin();
+        else score = getScoreWhenIsZeroToThree();
+        return score;
+    }
+
+    public void wonPoint(String player) {
+        if (player == "player1")
+            scorePlayer1 += 1;
         else
+            scorePlayer2 += 1;
+    }
+
+    public String getScoreWhenTie(int score){
+        switch (score)
         {
-            for (int i=1; i<3; i++)
-            {
-                if (i==1) tempScore = m_score1;
-                else { score+="-"; tempScore = m_score2;}
-                switch(tempScore)
-                {
-                    case 0:
-                        score+="Love";
-                        break;
-                    case 1:
-                        score+="Fifteen";
-                        break;
-                    case 2:
-                        score+="Thirty";
-                        break;
-                    case 3:
-                        score+="Forty";
-                        break;
-                }
-            }
+            case 0:
+                return "Love-All";
+            case 1:
+                return "Fifteen-All";
+            case 2:
+                return "Thirty-All";
+            default:
+                return "Deuce";
+        }
+    }
+
+    public String getScoreWhenIsAdvantageOrWin(){
+        String score = "";
+        int resultDifference = getResultDifference();
+        if (isDifferenceOne(resultDifference)) score ="Advantage player1";
+        else if (isDifferenceMinusOne(resultDifference)) score ="Advantage player2";
+        else if (isDifferenceGreaterThanTwo(resultDifference)) score = "Win for player1";
+        else score ="Win for player2";
+        return score;
+    }
+
+    public String getScoreWhenIsZeroToThree(){
+        String score = "";
+        Integer scorePlayers[] = {scorePlayer1,scorePlayer2};
+        for (int scorePlayer = 0;scorePlayer <scorePlayers.length;scorePlayer++){
+            if(isLastScorePlayer(scorePlayer)) score += "-";
+            score += assignScoreByPlayer(scorePlayers[scorePlayer]);
         }
         return score;
+    }
+
+    public Boolean isLastScorePlayer(Integer scorePlayer){
+        return scorePlayer == 1;
+    }
+
+    public String assignScoreByPlayer(Integer scoreByPlayer){
+        String score = "";
+        switch(scoreByPlayer)
+        {
+            case 0:
+                score+="Love";
+                break;
+            case 1:
+                score+="Fifteen";
+                break;
+            case 2:
+                score+="Thirty";
+                break;
+            case 3:
+                score+="Forty";
+                break;
+        }
+        return score;
+    }
+
+    public Boolean isResultEqual(){
+        return scorePlayer1==scorePlayer2;
+    }
+
+    public Boolean isResultGreaterThanFour(){
+        return scorePlayer1 >= 4 || scorePlayer2>=4;
+    }
+
+    public Integer getResultDifference(){
+        return scorePlayer1 - scorePlayer2;
+    }
+
+    public Boolean isDifferenceOne(Integer resultDifference){
+        return resultDifference == 1;
+    }
+
+    public Boolean isDifferenceMinusOne(Integer resultDifference){
+        return resultDifference == -1;
+    }
+
+    public Boolean isDifferenceGreaterThanTwo(Integer resultDifference){
+        return resultDifference >= 2;
     }
 }
