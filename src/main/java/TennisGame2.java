@@ -6,8 +6,6 @@ public class TennisGame2 implements TennisGame
     public int pointsPlayer1 = 0;
     public int pointsPlayer2 = 0;
 
-    public String scorePlayer1 = "";
-    public String scorePlayer2 = "";
     private String player1Name;
     private String player2Name;
 
@@ -17,12 +15,14 @@ public class TennisGame2 implements TennisGame
     }
 
     public String getScoreWhenTie(){
-        List scores = Arrays.asList(new String[] {"Love-All","Fifteen-All","Thirty-All","Deuce","Deuce"});
-        return scores.get(pointsPlayer1).toString();
+        String[] scores = {"Love-All","Fifteen-All","Thirty-All","Deuce","Deuce"};
+        return scores[pointsPlayer1];
     }
 
     public String getScorePlayer(Integer pointsPlayer){
         switch (pointsPlayer){
+            case 0:
+                return "Love";
             case  1:
                 return "Fifteen";
             case 2:
@@ -33,47 +33,55 @@ public class TennisGame2 implements TennisGame
     }
 
     public String getScoreWhenLovePlayer2(Integer pointsPlayer1){
-        scorePlayer1 = getScorePlayer(pointsPlayer1);
-        scorePlayer2 = "Love";
-        return scorePlayer1 + "-" + scorePlayer2;
+        return getScorePlayer(pointsPlayer1) + "-" + "Love";
     }
 
     public String getScoreWhenLovePlayer1(Integer pointsPlayer2){
-        scorePlayer2 = getScorePlayer(pointsPlayer2);
-        scorePlayer1 = "Love";
-        return scorePlayer1 + "-" + scorePlayer2;
+        return "Love" + "-" + getScorePlayer(pointsPlayer2);
     }
 
-    public String getScoreWhenPlayer1IsTemporallyWin(){
-        //{ 3, 1, "Forty-Fifteen"}
-        //{ 2, 1, "Thirty-Fifteen"}
-        if (pointsPlayer1>pointsPlayer2 && pointsPlayer1 < 4)
-        {
-            if (pointsPlayer1==2)
-                scorePlayer1="Thirty";
-            if (pointsPlayer1==3)
-                scorePlayer1="Forty";
-            if (pointsPlayer2==1)
-                scorePlayer2="Fifteen";
-            if (pointsPlayer2==2)
-                scorePlayer2="Thirty";
-        }
-        return scorePlayer1 + "-" + scorePlayer2;
+    public String getScoreWhenPlayerIsWinning(){
+        return getScorePlayer(pointsPlayer1) + "-" + getScorePlayer(pointsPlayer2);
     }
 
-    public String getScoreWhenPlayer2IsTemporallyWin(){
-        if (pointsPlayer2>pointsPlayer1 && pointsPlayer2 < 4)
-        {
-            if (pointsPlayer2==2)
-                scorePlayer2="Thirty";
-            if (pointsPlayer2==3)
-                scorePlayer2="Forty";
-            if (pointsPlayer1==1)
-                scorePlayer1="Fifteen";
-            if (pointsPlayer1==2)
-                scorePlayer1="Thirty";
+    public String getLove(){
+        if (checkPlayerLove(pointsPlayer1,pointsPlayer2)){
+            return getScoreWhenLovePlayer2(pointsPlayer1);
         }
-        return scorePlayer1 + "-" + scorePlayer2;
+        return getScoreWhenLovePlayer1(pointsPlayer2);
+    }
+
+    public String getPlayerWinning(){
+        String score = "";
+        if (checkPlayerWinning(pointsPlayer1, pointsPlayer2)){
+            score = getScoreWhenPlayerIsWinning();
+        }
+        if (checkPlayerWinning(pointsPlayer2, pointsPlayer1)){
+            score = getScoreWhenPlayerIsWinning();
+        }
+        return score;
+    }
+
+    public String getPlayerAdvantage(){
+        String score = "";
+        if (checkPlayerAdvantage(pointsPlayer1, pointsPlayer2)){
+            score = "Advantage player1";
+        }
+        if (checkPlayerAdvantage(pointsPlayer2, pointsPlayer1)){
+            score = "Advantage player2";
+        }
+        return score;
+    }
+
+    public String getPlayerWon(){
+        String score = "";
+        if (checkPlayerWon(pointsPlayer1, pointsPlayer2)){
+            score = "Win for player1";
+        }
+        if (checkPlayerWon(pointsPlayer2, pointsPlayer1)){
+            score = "Win for player2";
+        }
+        return score;
     }
 
 
@@ -81,20 +89,59 @@ public class TennisGame2 implements TennisGame
     public String getScore(){
 
         String score = "";
-        if (pointsPlayer1 == pointsPlayer2) score = getScoreWhenTie();
-        if (pointsPlayer1 > 0 && pointsPlayer2==0) score = getScoreWhenLovePlayer2(pointsPlayer1);
-        if (pointsPlayer2 > 0 && pointsPlayer1==0) score = getScoreWhenLovePlayer1(pointsPlayer2);
-        if (pointsPlayer1>pointsPlayer2 && pointsPlayer1 < 4) score = getScoreWhenPlayer1IsTemporallyWin();
-        if (pointsPlayer2>pointsPlayer1 && pointsPlayer2 < 4) score = getScoreWhenPlayer2IsTemporallyWin();
-        if (pointsPlayer1 > pointsPlayer2 && pointsPlayer2 >= 3) score = "Advantage player1";
-        if (pointsPlayer2 > pointsPlayer1 && pointsPlayer1 >= 3) score = "Advantage player2";
-        if (pointsPlayer1>=4 && pointsPlayer2>=0 && (pointsPlayer1-pointsPlayer2)>=2) score = "Win for player1";
-        if (pointsPlayer2>=4 && pointsPlayer1>=0 && (pointsPlayer2-pointsPlayer1)>=2) score = "Win for player2";
+        if (isTie()){
+            score = getScoreWhenTie();
+        }else if(isGameLove(pointsPlayer1, pointsPlayer2)){
+            score = getLove();
+        }else if(isGameWinning(pointsPlayer1, pointsPlayer2)){
+            score = getPlayerWinning();
+        }else if(isGameAdvantage(pointsPlayer1, pointsPlayer2)){
+            score = getPlayerAdvantage();
+        }
+        if(isGameWon(pointsPlayer1, pointsPlayer2)){
+            score = getPlayerWon();
+        }
         return score;
     }
 
     public void wonPoint(String player) {
         if (player == "player1") pointsPlayer1++;
         else pointsPlayer2++;
+    }
+
+    public Boolean checkPlayerLove(Integer points1, Integer points2){
+        return points1 > 0 && points2==0;
+    }
+
+    public Boolean checkPlayerWinning(Integer points1, Integer points2){
+        return points1 > points2 && points1 < 4;
+    }
+
+    public Boolean checkPlayerAdvantage(Integer points1, Integer points2){
+        return points1 > points2 && points2 >= 3;
+    }
+
+    public Boolean isGameLove(Integer points1,Integer points2){
+        return checkPlayerLove(points1,points2) || checkPlayerLove(points2, points1) ;
+    }
+
+    public Boolean isGameWinning(Integer points1, Integer points2){
+        return checkPlayerWinning(points1, points2) || checkPlayerWinning(points2, points1);
+    }
+
+    public Boolean isGameAdvantage(Integer points1,Integer points2){
+        return checkPlayerAdvantage(points1,points2) || checkPlayerAdvantage(points2, points1);
+    }
+
+    public Boolean isGameWon(Integer points1,Integer points2){
+        return checkPlayerWon(points1, points2) || checkPlayerWon(points2, points1);
+    }
+
+    public Boolean isTie(){
+        return pointsPlayer1 == pointsPlayer2;
+    }
+
+    public Boolean checkPlayerWon(Integer points1, Integer points2){
+        return points1 >=4 && points2 >=0 && (points1-points2) >= 2;
     }
 }

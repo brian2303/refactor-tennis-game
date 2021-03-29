@@ -53,8 +53,7 @@ public class TennisGame1 implements TennisGame {
     public String getScoreWhenIsZeroToThree(){
         String score = "";
         Integer scorePlayers[] = {scorePlayer1,scorePlayer2};
-        for (int scorePlayer = 0;scorePlayer <scorePlayers.length;scorePlayer++){
-            if(isLastScorePlayer(scorePlayer)) score += "-";
+        for (int scorePlayer = 0;scorePlayer <scorePlayers.length;scorePlayer++){ if(isLastScorePlayer(scorePlayer)) score += "-";
             score += assignScoreByPlayer(scorePlayers[scorePlayer]);
         }
         return score;
